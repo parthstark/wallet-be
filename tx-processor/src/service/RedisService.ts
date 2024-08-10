@@ -1,6 +1,6 @@
 import { createClient, RedisClientType } from 'redis';
 import { TransactionRequest, TransactionStatus } from '../types/transaction';
-import { TRANSACTION_PRE_PROCESSOR_QUE } from '../constants/constants';
+import { TRANSACTION_PRE_PROCESSOR_QUEUE } from '../constants/constants';
 
 interface fetchBalanceRequest { senderId: string, recipientId: string }
 interface fetchBalanceResponse { senderBalance: number, recipientBalance: number }
@@ -40,8 +40,8 @@ class RedisService {
         return RedisService.instance;
     }
 
-    public async popTransaction(): Promise<TransactionRequest> {
-        const { element } = await this.redisClient.blPop(TRANSACTION_PRE_PROCESSOR_QUE, 0) ?? {};
+    public async popTransactionPreProcessorQueue(): Promise<TransactionRequest> {
+        const { element } = await this.redisClient.blPop(TRANSACTION_PRE_PROCESSOR_QUEUE, 0) ?? {};
 
         if (!element) {
             const emptyTransaction: TransactionRequest = {

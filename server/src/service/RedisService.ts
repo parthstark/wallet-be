@@ -1,5 +1,5 @@
 import { createClient, RedisClientType } from 'redis';
-import { TRANSACTION_PRE_PROCESSOR_QUE } from '../constants/constants';
+import { TRANSACTION_PRE_PROCESSOR_QUEUE } from '../constants/constants';
 import { TransactionRequest } from '../types/transaction';
 
 class RedisService {
@@ -31,7 +31,7 @@ class RedisService {
     }
 
     public async pushTransactionToQueue(transactionRequest: TransactionRequest): Promise<void> {
-        await this.redisClient.rPush(TRANSACTION_PRE_PROCESSOR_QUE, JSON.stringify(transactionRequest));
+        await this.redisClient.rPush(TRANSACTION_PRE_PROCESSOR_QUEUE, JSON.stringify(transactionRequest));
     }
 
     public subscribeToTransaction(transactionId: string, callback: (message: string) => void): void {

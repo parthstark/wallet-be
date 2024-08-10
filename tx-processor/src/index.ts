@@ -6,7 +6,7 @@ async function processTransaction() {
 
     while (true) {
         try {
-            const { transactionId, senderId, recipientId, amountInPaise } = await redisService.popTransaction()
+            const { transactionId, senderId, recipientId, amountInPaise } = await redisService.popTransactionPreProcessorQueue()
             if (!transactionId) {
                 continue
             }
@@ -26,6 +26,7 @@ async function processTransaction() {
                 })
                 transactionStatus = 'SUCCESS';
             }
+
 
             await redisService.publishTransactionStatus({ transactionId, transactionStatus })
 
