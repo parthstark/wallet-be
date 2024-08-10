@@ -89,7 +89,6 @@ class RedisService {
             transactionStatus,
             timestamp: new Date().getTime(),
         })
-        console.log(pubsubChannel, pubsubMessage);
         await this.pubsubClient.publish(pubsubChannel, pubsubMessage);
     }
 }

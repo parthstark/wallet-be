@@ -13,6 +13,7 @@ router.post('/send-money', async (req, res) => {
         })
         return
     }
+    console.log(`handling request for ${senderId}`);
 
     const transactionId = uuidv4()
     const transactionRequest: TransactionRequest = {
@@ -27,10 +28,14 @@ router.post('/send-money', async (req, res) => {
 
         await redisService.pushTransactionToQueue(transactionRequest);
 
-        res.json({
-            transactionId,
-            message: "processing"
-        });
+        redisService.subscribeToTransaction(transactionId, (message) => {
+            const { transactionStatus, timestamp } = JSON.parse(message)
+            res.json({
+                transactionId,
+                transactionStatus,
+                timestamp,
+            });
+        })
     } catch (err) {
         console.error('error processing transaction:', err);
         res.status(500).json({ message: 'internal server error' });
