@@ -4,9 +4,9 @@ import RedisService from '@common/utils/RedisService';
 const router = Router();
 
 router.post('/fetch-balance', async (req: Request, res: Response) => {
-    const { accountId } = req.body
+    const { userId } = req.body
 
-    if (!accountId) {
+    if (!userId) {
         res.status(400).json({
             message: "bad request"
         });
@@ -15,10 +15,10 @@ router.post('/fetch-balance', async (req: Request, res: Response) => {
 
     try {
         const redisService = await RedisService.getInstance();
-        const balance = await redisService.getBalance(accountId as string);
+        const balance = await redisService.getBalance(userId as string);
 
         res.json({
-            accountId,
+            userId,
             balance
         });
     } catch (err) {

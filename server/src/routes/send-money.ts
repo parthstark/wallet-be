@@ -6,19 +6,19 @@ import { TransactionRequest } from '@common/types/transaction';
 const router = Router();
 
 router.post('/send-money', async (req, res) => {
-    const { senderId, recipientId, amountInPaise } = req.body
-    if (!senderId || !recipientId || !amountInPaise) {
+    const { userId, recipientId, amountInPaise } = req.body
+    if (!userId || !recipientId || !amountInPaise) {
         res.status(400).json({
             message: "bad request"
         })
         return
     }
-    console.log(`handling request for ${senderId}`);
+    console.log(`handling request for ${userId}`);
 
     const transactionId = uuidv4()
     const transactionRequest: TransactionRequest = {
         transactionId,
-        senderId,
+        senderId: userId,
         recipientId,
         amountInPaise,
     };
