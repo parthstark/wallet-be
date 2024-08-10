@@ -1,6 +1,6 @@
 import { createClient, RedisClientType } from 'redis';
 import { TransactionRequest, TransactionStatus } from '../types/transaction';
-import { TRANSACTION_PRE_PROCESSOR_QUEUE } from '../constants/constants';
+import { TRANSACTION_PRE_DB_WRITER_QUEUE, TRANSACTION_PRE_PROCESSOR_QUEUE } from '../constants/constants';
 
 interface fetchBalanceRequest { senderId: string, recipientId: string }
 interface fetchBalanceResponse { senderBalanceInPaise: number, recipientBalanceInPaise: number }
@@ -100,15 +100,8 @@ class RedisService {
         await this.pubsubClient.publish(pubsubChannel, pubsubMessage);
     }
 
-    public async pushTransactionPreDBWriterQueue({
-        transactionId,
-        senderId,
-        recipientId,
-        amountInPaise,
-        newSenderBalanceInPaise,
-        newRecipientBalanceInPaise,
-    }: pushTransactionPreDBWriterQueueRequest): Promise<void> {
-
+    public async pushTransactionPreDBWriterQueue(transactionDBData: pushTransactionPreDBWriterQueueRequest): Promise<void> {
+        await this.redisClient.rPush(TRANSACTION_PRE_DB_WRITER_QUEUE, JSON.stringify(transactionDBData));
     }
 }
 
