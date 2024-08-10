@@ -35,7 +35,8 @@ class RedisService {
     }
 
     public subscribeToTransaction(transactionId: string, callback: (message: string) => void): void {
-        this.pubsubClient.subscribe(transactionId, callback);
+        const pubsubChannel = `transaction:${transactionId}`;
+        this.pubsubClient.subscribe(pubsubChannel, callback);
     }
 
     public getBalance(accountId: string): Promise<number> {
