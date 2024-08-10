@@ -30,7 +30,7 @@ class RedisService {
         return RedisService.instance;
     }
 
-    public async pushTransactionToQueue(transactionRequest: TransactionRequest): Promise<void> {
+    public async pushTransactionPreProcessorQueue(transactionRequest: TransactionRequest): Promise<void> {
         await this.redisClient.rPush(TRANSACTION_PRE_PROCESSOR_QUEUE, JSON.stringify(transactionRequest));
     }
 

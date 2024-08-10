@@ -3,14 +3,22 @@ import { TransactionRequest, TransactionStatus } from '../types/transaction';
 import { TRANSACTION_PRE_PROCESSOR_QUEUE } from '../constants/constants';
 
 interface fetchBalanceRequest { senderId: string, recipientId: string }
-interface fetchBalanceResponse { senderBalance: number, recipientBalance: number }
-interface updateBalanceRequest {
+interface fetchBalanceResponse { senderBalanceInPaise: number, recipientBalanceInPaise: number }
+interface updateRedisStoreUserBalancesRequest {
     senderId: string,
-    newSenderBalance: number,
+    newSenderBalanceInPaise: number,
     recipientId: string,
-    newRecipientBalance: number,
+    newRecipientBalanceInPaise: number,
 }
 interface publishTransactionStatusRequest { transactionId: string, transactionStatus: TransactionStatus }
+interface pushTransactionPreDBWriterQueueRequest {
+    transactionId: string,
+    senderId: string,
+    recipientId: string,
+    amountInPaise: number,
+    newSenderBalanceInPaise: number,
+    newRecipientBalanceInPaise: number,
+}
 
 class RedisService {
     private static instance: RedisService;
@@ -62,24 +70,24 @@ class RedisService {
 
         const [senderBalanceString, recipientBalanceString] = await this.redisClient.mGet([senderBalanceKey, recipientBalanceKey]);
 
-        const senderBalance = parseInt(senderBalanceString || '0', 10);
-        const recipientBalance = parseInt(recipientBalanceString || '0', 10);
+        const senderBalanceInPaise = parseInt(senderBalanceString || '0', 10);
+        const recipientBalanceInPaise = parseInt(recipientBalanceString || '0', 10);
 
-        return { senderBalance, recipientBalance }
+        return { senderBalanceInPaise, recipientBalanceInPaise }
     }
 
-    public async updateBalance({
+    public async updateRedisStoreUserBalances({
         senderId,
-        newSenderBalance,
+        newSenderBalanceInPaise,
         recipientId,
-        newRecipientBalance
-    }: updateBalanceRequest): Promise<void> {
+        newRecipientBalanceInPaise
+    }: updateRedisStoreUserBalancesRequest): Promise<void> {
         const senderBalanceKey = `balance:${senderId}`;
         const recipientBalanceKey = `balance:${recipientId}`;
 
         const multi = this.redisClient.multi();
-        multi.set(senderBalanceKey, newSenderBalance);
-        multi.set(recipientBalanceKey, newRecipientBalance);
+        multi.set(senderBalanceKey, newSenderBalanceInPaise);
+        multi.set(recipientBalanceKey, newRecipientBalanceInPaise);
         await multi.exec();
     }
 
@@ -90,6 +98,17 @@ class RedisService {
             timestamp: new Date().getTime(),
         })
         await this.pubsubClient.publish(pubsubChannel, pubsubMessage);
+    }
+
+    public async pushTransactionPreDBWriterQueue({
+        transactionId,
+        senderId,
+        recipientId,
+        amountInPaise,
+        newSenderBalanceInPaise,
+        newRecipientBalanceInPaise,
+    }: pushTransactionPreDBWriterQueueRequest): Promise<void> {
+
     }
 }
 

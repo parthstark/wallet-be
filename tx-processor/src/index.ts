@@ -11,22 +11,30 @@ async function processTransaction() {
                 continue
             }
 
-            const { senderBalance, recipientBalance } = await redisService.fetchBalance({ senderId, recipientId })
+            const { senderBalanceInPaise, recipientBalanceInPaise } = await redisService.fetchBalance({ senderId, recipientId })
             let transactionStatus: TransactionStatus = 'FAILURE';
 
-            if (senderBalance >= amountInPaise) {
-                const newSenderBalance = senderBalance - amountInPaise;
-                const newRecipientBalance = recipientBalance + amountInPaise;
+            if (senderBalanceInPaise >= amountInPaise) {
+                const newSenderBalanceInPaise = senderBalanceInPaise - amountInPaise;
+                const newRecipientBalanceInPaise = recipientBalanceInPaise + amountInPaise;
 
-                await redisService.updateBalance({
+                await redisService.updateRedisStoreUserBalances({
                     senderId,
-                    newSenderBalance,
+                    newSenderBalanceInPaise,
                     recipientId,
-                    newRecipientBalance
+                    newRecipientBalanceInPaise
                 })
                 transactionStatus = 'SUCCESS';
-            }
 
+                await redisService.pushTransactionPreDBWriterQueue({
+                    transactionId,
+                    senderId,
+                    recipientId,
+                    amountInPaise,
+                    newSenderBalanceInPaise,
+                    newRecipientBalanceInPaise,
+                })
+            }
 
             await redisService.publishTransactionStatus({ transactionId, transactionStatus })
 

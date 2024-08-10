@@ -26,7 +26,7 @@ router.post('/send-money', async (req, res) => {
     try {
         const redisService = await RedisService.getInstance();
 
-        await redisService.pushTransactionToQueue(transactionRequest);
+        await redisService.pushTransactionPreProcessorQueue(transactionRequest);
 
         redisService.subscribeToTransaction(transactionId, (message) => {
             const { transactionStatus, timestamp } = JSON.parse(message)
