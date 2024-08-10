@@ -113,8 +113,11 @@ class RedisService {
         await this.redisClient.rPush(TRANSACTION_PRE_DB_WRITER_QUEUE, JSON.stringify(transactionDBData));
     }
 
-    public getBalance(accountId: string): Promise<number> {
-        return new Promise(resolve => resolve(1236700))
+    public async getBalance(accountId: string): Promise<number> {
+        const accountIdKey = `balance:${accountId}`;
+        const accountIdBalanceString = await this.redisClient.get(accountIdKey);
+        const accountIdBalanceInPaise = parseInt(accountIdBalanceString || '0', 10);
+        return accountIdBalanceInPaise
     }
 }
 
