@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import RedisService from '../service/RedisService';
+import RedisService from '@common/utils/RedisService';
 
 const router = Router();
 

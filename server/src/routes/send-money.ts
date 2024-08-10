@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { TransactionRequest } from '../types/transaction';
-import RedisService from '../service/RedisService';
+import RedisService from '@common/utils/RedisService';
+import { TransactionRequest } from '@common/types/transaction';
 
 const router = Router();
 

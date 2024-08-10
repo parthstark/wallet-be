@@ -1,5 +1,5 @@
-import RedisService from './service/RedisService';
-import { TransactionStatus } from './types/transaction';
+import { TransactionStatus } from '@common/types/transaction';
+import RedisService from '@common/utils/RedisService';
 
 async function processTransaction() {
     const redisService = await RedisService.getInstance();
