@@ -4,6 +4,8 @@ import RedisService from '@common/utils/RedisService';
 import { TransactionRequest } from '@common/types/transaction';
 import authMiddleware from 'middlewares/authMiddleware';
 
+const TRANSACTION_TIMEOUT = 10000; // 10 seconds
+
 const router = Router();
 
 router.post('/send-money', authMiddleware, async (req, res) => {
@@ -28,8 +30,17 @@ router.post('/send-money', authMiddleware, async (req, res) => {
 
         await redisService.pushTransactionPreProcessorQueue(transactionRequest);
 
-        // what happens when message is not received, api is stuck...
+        // Start a timer for 30 seconds
+        const timer = setTimeout(() => {
+            return res.json({
+                transactionId,
+                transactionStatus: 'PENDING'
+            });
+        }, TRANSACTION_TIMEOUT);
+
         redisService.subscribeToTransaction(transactionId, (message) => {
+            clearTimeout(timer);
+
             const { transactionStatus, timestamp } = JSON.parse(message)
             res.json({
                 transactionId,
