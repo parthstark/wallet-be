@@ -8,7 +8,7 @@ const app = express()
 app.use(express.json())
 
 app.get('/', (req, res) => {
-    res.json({
+    return res.json({
         message: "healthy server"
     })
 })

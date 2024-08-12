@@ -11,10 +11,9 @@ const router = Router();
 router.post('/send-money', authMiddleware, async (req, res) => {
     const { userId, recipientId, amountInPaise } = req.body
     if (!userId || !recipientId || !amountInPaise) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "bad request"
         })
-        return
     }
 
     const transactionId = uuidv4()
@@ -42,7 +41,7 @@ router.post('/send-money', authMiddleware, async (req, res) => {
             clearTimeout(timer);
 
             const { transactionStatus, timestamp } = JSON.parse(message)
-            res.json({
+            return res.json({
                 transactionId,
                 transactionStatus,
                 timestamp,
@@ -50,7 +49,7 @@ router.post('/send-money', authMiddleware, async (req, res) => {
         })
     } catch (err) {
         console.error('error processing transaction:', err);
-        res.status(500).json({ message: 'internal server error' });
+        return res.status(500).json({ message: 'internal server error' });
     }
 })
 

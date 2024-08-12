@@ -26,7 +26,7 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign({ userId: username }, JWT_SECRET_KEY, { expiresIn: '1d' });
 
-    res.status(200).json({ token });
+    return res.status(200).json({ token });
 });
 
 export default router;

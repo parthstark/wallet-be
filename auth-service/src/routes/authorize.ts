@@ -14,9 +14,9 @@ router.post('/authorize', async (req, res) => {
     try {
         const decoded = jwt.verify(authToken, JWT_SECRET_KEY) as JwtPayload;
         const { userId } = decoded;
-        res.status(200).json({ userId });
+        return res.status(200).json({ userId });
     } catch (error) {
-        res.status(401).json({ message: 'invalid authorization token' });
+        return res.status(401).json({ message: 'invalid authorization token' });
     }
 });
 
