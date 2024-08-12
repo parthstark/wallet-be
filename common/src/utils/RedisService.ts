@@ -21,6 +21,7 @@ interface pushTransactionPreDBWriterQueueRequest {
 }
 interface userRequest { username: string, hashedPassword: string }
 interface signupUserResponse { alreadyExists: boolean }
+interface getUserHashedPasswordRequest { username: string }
 
 class RedisService {
     private static instance: RedisService;
@@ -130,6 +131,10 @@ class RedisService {
 
         await this.redisClient.set(`user:${username}`, hashedPassword);
         return { alreadyExists: false }
+    }
+
+    public async getUserHashedPassword({ username }: getUserHashedPasswordRequest): Promise<string | null> {
+        return await this.redisClient.get(`user:${username}`);
     }
 
     public async pushSignupUserQueue(user: userRequest): Promise<void> {

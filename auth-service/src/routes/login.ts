@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import { JWT_SECRET_KEY } from 'constants/constants';
 import RedisService from '@common/utils/RedisService';
 
@@ -12,17 +13,16 @@ router.post('/login', async (req, res) => {
         return res.status(400).json({ message: 'username and password are required' });
     }
 
-    // const user = users[username];
+    const redisService = await RedisService.getInstance();
+    const savedHashedPassword = await redisService.getUserHashedPassword({ username })
+    if (!savedHashedPassword) {
+        return res.status(400).json({ message: 'invalid username or password' });
+    }
 
-    // if (!user) {
-    //     return res.status(400).json({ message: 'invalid username or password' });
-    // }
-
-    // const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    // if (!isPasswordValid) {
-    //     return res.status(400).json({ message: 'Invalid username or password' });
-    // }
+    const isPasswordValid = await bcrypt.compare(password, savedHashedPassword);
+    if (!isPasswordValid) {
+        return res.status(400).json({ message: 'invalid username or password' });
+    }
 
     const token = jwt.sign({ userId: username }, JWT_SECRET_KEY, { expiresIn: '1d' });
 
