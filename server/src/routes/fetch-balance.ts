@@ -7,12 +7,6 @@ const router = Router();
 router.post('/fetch-balance', authMiddleware, async (req, res) => {
     const { userId } = req.body
 
-    if (!userId) {
-        return res.status(400).json({
-            message: "bad request"
-        });
-    }
-
     try {
         const redisService = await RedisService.getInstance();
         const balance = await redisService.getBalance(userId as string);

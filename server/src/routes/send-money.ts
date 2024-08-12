@@ -10,7 +10,8 @@ const router = Router();
 
 router.post('/send-money', authMiddleware, async (req, res) => {
     const { userId, recipientId, amountInPaise } = req.body
-    if (!userId || !recipientId || !amountInPaise) {
+
+    if (!recipientId || !amountInPaise) {
         return res.status(400).json({
             message: "bad request"
         })
