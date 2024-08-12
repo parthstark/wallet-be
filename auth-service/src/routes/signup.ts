@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import RedisService from '@common/utils/RedisService';
+import { BCRYPT_SALT_ROUNDS_COUNT, JWT_SECRET_KEY } from 'constants/constants';
 
 const router = Router();
-const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || ''
 
 router.post('/signup', async (req, res) => {
     const { username, password } = req.body;
@@ -12,15 +13,15 @@ router.post('/signup', async (req, res) => {
         return res.status(400).json({ message: 'username and password are required' });
     }
 
-    // if (users[username]) {
-    //     return res.status(400).json({ message: 'User already exists' });
-    // }
+    const redisService = await RedisService.getInstance();
 
-    // const hashedPassword = await bcrypt.hash(password, 10);
-    // const userId = `user_${Date.now()}`;
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS_COUNT);
+    const { alreadyExists } = await redisService.signupUser({ username, hashedPassword })
+    if (alreadyExists) {
+        return res.status(400).json({ message: 'user already exists' });
+    }
 
-    // // Store the user in the "database"
-    // users[username] = { password: hashedPassword, userId };
+    await redisService.pushSignupUserQueue({ username, hashedPassword })
 
     const token = jwt.sign({ userId: username }, JWT_SECRET_KEY, { expiresIn: '1d' });
 

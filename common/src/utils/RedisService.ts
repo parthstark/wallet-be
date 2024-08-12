@@ -1,4 +1,4 @@
-import { TRANSACTION_PRE_PROCESSOR_QUEUE, TRANSACTION_PRE_DB_WRITER_QUEUE } from '../constants/constants'
+import { TRANSACTION_PRE_PROCESSOR_QUEUE, TRANSACTION_PRE_DB_WRITER_QUEUE, SIGNUP_USER_QUEUE } from '../constants/constants'
 import { createClient, RedisClientType } from 'redis';
 import { TransactionStatus, TransactionRequest } from '../types/transaction';
 
@@ -19,6 +19,8 @@ interface pushTransactionPreDBWriterQueueRequest {
     newSenderBalanceInPaise: number,
     newRecipientBalanceInPaise: number,
 }
+interface userRequest { username: string, hashedPassword: string }
+interface signupUserResponse { alreadyExists: boolean }
 
 class RedisService {
     private static instance: RedisService;
@@ -118,6 +120,20 @@ class RedisService {
         const accountIdBalanceString = await this.redisClient.get(accountIdKey);
         const accountIdBalanceInPaise = parseInt(accountIdBalanceString || '0', 10);
         return accountIdBalanceInPaise
+    }
+
+    public async signupUser({ username, hashedPassword }: userRequest): Promise<signupUserResponse> {
+        const savedHash = await this.redisClient.get(`user:${username}`);
+        if (savedHash) {
+            return { alreadyExists: true }
+        }
+
+        await this.redisClient.set(`user:${username}`, hashedPassword);
+        return { alreadyExists: false }
+    }
+
+    public async pushSignupUserQueue(user: userRequest): Promise<void> {
+        await this.redisClient.rPush(SIGNUP_USER_QUEUE, JSON.stringify(user));
     }
 }
 
