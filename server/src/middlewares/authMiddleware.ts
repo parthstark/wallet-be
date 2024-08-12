@@ -7,10 +7,11 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
         req.body.userId = response.userId;
         next();
     } catch (error) {
-        if (isAxiosError(error)) {
+        if (isAxiosError(error) && error.response) {
             return res.status(401).json({ message: error.response?.data.message });
+        } else {
+            return res.status(500).json({ message: 'internal Server Error' });
         }
-        return res.status(401).json({ message: 'authorization failed' });
     }
 };
 

@@ -14,7 +14,6 @@ router.post('/send-money', authMiddleware, async (req, res) => {
         })
         return
     }
-    console.log(`handling request for ${userId}`);
 
     const transactionId = uuidv4()
     const transactionRequest: TransactionRequest = {

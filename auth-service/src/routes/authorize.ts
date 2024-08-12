@@ -16,7 +16,7 @@ router.post('/authorize', async (req, res) => {
         const { userId } = decoded;
         res.status(200).json({ userId });
     } catch (error) {
-        res.status(401).json({ message: 'invalid token' });
+        res.status(401).json({ message: 'invalid authorization token' });
     }
 });
 
