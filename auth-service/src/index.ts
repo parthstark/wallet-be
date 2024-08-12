@@ -2,6 +2,8 @@ import express from 'express'
 import signupRoute from './routes/signup'
 import loginRoute from './routes/login'
 import authorizeRoute from './routes/authorize'
+import { validateConfig } from 'utils/utils'
+validateConfig()
 
 const PORT = 3001
 
