@@ -1,26 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
+import axios, { isAxiosError } from 'axios';
 
-const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-        return res.status(401).json({ message: 'authorization header missing' });
-    }
-
+const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const userId = extractUserIdFromToken(authHeader);
-        req.body.userId = userId;
-
+        const response = await authorizeUser(req);
+        req.body.userId = response.userId;
         next();
     } catch (error) {
-        return res.status(401).json({ message: 'unauthorized request' });
+        if (isAxiosError(error)) {
+            return res.status(401).json({ message: error.response?.data.message });
+        }
+        return res.status(401).json({ message: 'authorization failed' });
     }
 };
 
-const extractUserIdFromToken = (token: string): string => {
-    // Assuming the token is a JWT and the userId is stored in the payload
-    // Replace this with your actual token decoding logic
-    return token; // Replace with actual userId extraction
+const authorizeUser = async (req: Request): Promise<any> => {
+    const response = await axios.post('http://localhost:3001/api/v1/authorize', {}, {
+        headers: {
+            Authorization: req.headers.authorization
+        }
+    });
+    return response.data;
 };
 
 export default authMiddleware
