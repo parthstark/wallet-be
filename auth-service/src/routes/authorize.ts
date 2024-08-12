@@ -1,8 +1,8 @@
+import { JWT_SECRET_KEY } from 'constants/constants';
 import { Router } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const router = Router();
-const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || ''
 
 router.post('/authorize', async (req, res) => {
     const authToken = req.headers.authorization;
