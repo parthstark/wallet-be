@@ -22,6 +22,7 @@ interface pushTransactionPreDBWriterQueueRequest {
 interface userRequest { username: string, hashedPassword: string }
 interface signupUserResponse { alreadyExists: boolean }
 interface getUserHashedPasswordRequest { username: string }
+interface setBalanceRequest { userId: string, balanceInPaise: number }
 
 class RedisService {
     private static instance: RedisService;
@@ -116,11 +117,16 @@ class RedisService {
         await this.redisClient.rPush(TRANSACTION_PRE_DB_WRITER_QUEUE, JSON.stringify(transactionDBData));
     }
 
-    public async getBalance(accountId: string): Promise<number> {
-        const accountIdKey = `balance:${accountId}`;
+    public async getBalance(userId: string): Promise<number> {
+        const accountIdKey = `balance:${userId}`;
         const accountIdBalanceString = await this.redisClient.get(accountIdKey);
         const accountIdBalanceInPaise = parseInt(accountIdBalanceString || '0', 10);
         return accountIdBalanceInPaise
+    }
+
+    public async setBalance({ userId, balanceInPaise }: setBalanceRequest): Promise<void> {
+        const accountIdKey = `balance:${userId}`;
+        await this.redisClient.set(accountIdKey, balanceInPaise);
     }
 
     public async signupUser({ username, hashedPassword }: userRequest): Promise<signupUserResponse> {
