@@ -1,28 +1,15 @@
 import { TRANSACTION_PRE_PROCESSOR_QUEUE, TRANSACTION_PRE_DB_WRITER_QUEUE, SIGNUP_USER_QUEUE } from '../constants/constants'
 import { createClient, RedisClientType } from 'redis';
-import { TransactionStatus, TransactionRequest } from '../types/transaction';
-
-interface fetchBalanceRequest { senderId: string, recipientId: string }
-interface fetchBalanceResponse { senderBalanceInPaise: number, recipientBalanceInPaise: number }
-interface updateRedisStoreUserBalancesRequest {
-    senderId: string,
-    newSenderBalanceInPaise: number,
-    recipientId: string,
-    newRecipientBalanceInPaise: number,
-}
-interface publishTransactionStatusRequest { transactionId: string, transactionStatus: TransactionStatus }
-interface pushTransactionPreDBWriterQueueRequest {
-    transactionId: string,
-    senderId: string,
-    recipientId: string,
-    amountInPaise: number,
-    newSenderBalanceInPaise: number,
-    newRecipientBalanceInPaise: number,
-}
-interface userRequest { username: string, hashedPassword: string }
-interface signupUserResponse { alreadyExists: boolean }
-interface getUserHashedPasswordRequest { username: string }
-interface setBalanceRequest { userId: string, balanceInPaise: number }
+import { TransactionRequest } from '../types/transaction';
+import {
+    updateRedisStoreUserBalancesRequest,
+    publishTransactionStatusRequest,
+    pushTransactionPreDBWriterQueueRequest,
+    setBalanceRequest,
+    userRequest,
+    signupUserResponse,
+    getUserHashedPasswordRequest
+} from 'types/redis-service';
 
 class RedisService {
     private static instance: RedisService;

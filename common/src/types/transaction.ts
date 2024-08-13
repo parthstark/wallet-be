@@ -5,4 +5,4 @@ export interface TransactionRequest {
     amountInPaise: number;
 }
 
-export type TransactionStatus = 'FAILURE' | 'SUCCESS'
+export type TransactionStatus = 'FAILURE' | 'SUCCESS' | 'PENDING'
