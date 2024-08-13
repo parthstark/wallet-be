@@ -17,11 +17,14 @@ async function processTransaction() {
                 redisService.getBalance(recipientId)
             ])
 
-            let transactionStatus: TransactionStatus = 'FAILURE';
+            let transactionStatus: TransactionStatus | undefined
+            let timestamp: number | undefined
 
             if (senderBalanceInPaise >= amountInPaise) {
                 const newSenderBalanceInPaise = senderBalanceInPaise - amountInPaise;
                 const newRecipientBalanceInPaise = recipientBalanceInPaise + amountInPaise;
+                timestamp = new Date().getTime()
+                transactionStatus = 'SUCCESS';
 
                 await redisService.updateRedisStoreUserBalances({
                     senderId,
@@ -29,16 +32,20 @@ async function processTransaction() {
                     recipientId,
                     newRecipientBalanceInPaise
                 })
-                transactionStatus = 'SUCCESS';
 
                 await redisService.pushTransactionPreDBWriterQueue({
                     ...transactionRequest,
                     newSenderBalanceInPaise,
                     newRecipientBalanceInPaise,
+                    timestamp
                 })
             }
 
-            await redisService.publishTransactionStatus({ transactionId, transactionStatus })
+            if (!timestamp || !transactionStatus) {
+                timestamp = new Date().getTime()
+                transactionStatus = 'FAILURE'
+            }
+            await redisService.publishTransactionStatus({ transactionId, transactionStatus, timestamp })
 
         } catch (error) {
             console.error('error processing transaction:', error);

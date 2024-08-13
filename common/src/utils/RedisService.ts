@@ -4,11 +4,11 @@ import { TransactionRequest } from '../types/transaction';
 import {
     updateRedisStoreUserBalancesRequest,
     publishTransactionStatusRequest,
-    pushTransactionPreDBWriterQueueRequest,
     setBalanceRequest,
     userRequest,
     signupUserResponse,
-    getUserHashedPasswordRequest
+    getUserHashedPasswordRequest,
+    ExecutedTransaction
 } from 'types/redis-service';
 
 class RedisService {
@@ -45,16 +45,10 @@ class RedisService {
 
     public async popTransactionPreProcessorQueue(): Promise<TransactionRequest> {
         const { element } = await this.redisClient.blPop(TRANSACTION_PRE_PROCESSOR_QUEUE, 0) ?? {};
-
         if (!element) {
-            const emptyTransaction: TransactionRequest = {
-                transactionId: '',
-                senderId: '',
-                recipientId: '',
-                amountInPaise: 0
-            }
             return emptyTransaction
         }
+
         const transaction: TransactionRequest = JSON.parse(element);
         return transaction
     }
@@ -74,11 +68,11 @@ class RedisService {
         await multi.exec();
     }
 
-    public async publishTransactionStatus({ transactionId, transactionStatus }: publishTransactionStatusRequest): Promise<void> {
+    public async publishTransactionStatus({ transactionId, transactionStatus, timestamp }: publishTransactionStatusRequest): Promise<void> {
         const pubsubChannel = `transaction:${transactionId}`;
         const pubsubMessage = JSON.stringify({
             transactionStatus,
-            timestamp: new Date().getTime(),
+            timestamp,
         })
         await this.pubsubClient.publish(pubsubChannel, pubsubMessage);
     }
@@ -88,8 +82,18 @@ class RedisService {
         this.pubsubClient.subscribe(pubsubChannel, callback);
     }
 
-    public async pushTransactionPreDBWriterQueue(transactionDBData: pushTransactionPreDBWriterQueueRequest): Promise<void> {
+    public async pushTransactionPreDBWriterQueue(transactionDBData: ExecutedTransaction): Promise<void> {
         await this.redisClient.rPush(TRANSACTION_PRE_DB_WRITER_QUEUE, JSON.stringify(transactionDBData));
+    }
+
+    public async popTransactionPreDBWriterQueue(): Promise<ExecutedTransaction> {
+        const { element } = await this.redisClient.blPop(TRANSACTION_PRE_DB_WRITER_QUEUE, 0) ?? {};
+        if (!element) {
+            return emptyExecutedTransaction
+        }
+
+        const executedTransaction: ExecutedTransaction = JSON.parse(element);
+        return executedTransaction
     }
 
     public async getBalance(userId: string): Promise<number> {
@@ -121,6 +125,23 @@ class RedisService {
     public async pushSignupUserQueue(user: userRequest): Promise<void> {
         await this.redisClient.rPush(SIGNUP_USER_QUEUE, JSON.stringify(user));
     }
+}
+
+const emptyTransaction: TransactionRequest = {
+    transactionId: '',
+    senderId: '',
+    recipientId: '',
+    amountInPaise: 0
+}
+
+const emptyExecutedTransaction: ExecutedTransaction = {
+    transactionId: '',
+    senderId: '',
+    recipientId: '',
+    amountInPaise: 0,
+    newSenderBalanceInPaise: 0,
+    newRecipientBalanceInPaise: 0,
+    timestamp: 0
 }
 
 export default RedisService;

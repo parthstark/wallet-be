@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import RedisService from '@common/utils/RedisService';
-import { TransactionRequest } from '@common/types/transaction';
+import { TransactionRequest, TransactionStatus } from '@common/types/transaction';
 import authMiddleware from 'middlewares/authMiddleware';
 
 const TRANSACTION_TIMEOUT = 10000; // 10 seconds
@@ -34,7 +34,7 @@ router.post('/send-money', authMiddleware, async (req, res) => {
         const timer = setTimeout(() => {
             return res.json({
                 transactionId,
-                transactionStatus: 'PENDING'
+                transactionStatus: 'PENDING' as TransactionStatus
             });
         }, TRANSACTION_TIMEOUT);
 

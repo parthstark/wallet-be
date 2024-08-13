@@ -10,9 +10,10 @@ datasource db {
 model User {
   userId         String @unique
   hashedPassword String
+  balanceInPaise Int
 
-  sentTransactions     Transaction[] @relation("sentTransactions")
-  receivedTransactions Transaction[] @relation("receivedTransactions")
+  creditTransactions Transaction[] @relation("creditTransactions")
+  debitTransactions  Transaction[] @relation("debitTransactions")
 }
 
 model Transaction {
@@ -20,11 +21,11 @@ model Transaction {
   transactionId               String
   amountInPaise               Int
   userBalanceAfterTransaction Int
-  createdAt                   DateTime
+  timestamp                   DateTime
 
-  sender   User   @relation("sentTransactions", fields: [senderId], references: [userId])
-  senderId String
+  creditor   User   @relation("creditTransactions", fields: [creditorId], references: [userId])
+  creditorId String
 
-  recipient   User   @relation("receivedTransactions", fields: [recipientId], references: [userId])
-  recipientId String
+  debitor   User   @relation("debitTransactions", fields: [debitorId], references: [userId])
+  debitorId String
 }
