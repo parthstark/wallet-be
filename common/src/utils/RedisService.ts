@@ -72,18 +72,6 @@ class RedisService {
         return transaction
     }
 
-    public async fetchBalance({ senderId, recipientId }: fetchBalanceRequest): Promise<fetchBalanceResponse> {
-        const senderBalanceKey = `balance:${senderId}`;
-        const recipientBalanceKey = `balance:${recipientId}`;
-
-        const [senderBalanceString, recipientBalanceString] = await this.redisClient.mGet([senderBalanceKey, recipientBalanceKey]);
-
-        const senderBalanceInPaise = parseInt(senderBalanceString || '0', 10);
-        const recipientBalanceInPaise = parseInt(recipientBalanceString || '0', 10);
-
-        return { senderBalanceInPaise, recipientBalanceInPaise }
-    }
-
     public async updateRedisStoreUserBalances({
         senderId,
         newSenderBalanceInPaise,

@@ -12,7 +12,11 @@ async function processTransaction() {
                 continue
             }
 
-            const { senderBalanceInPaise, recipientBalanceInPaise } = await redisService.fetchBalance({ senderId, recipientId })
+            const [senderBalanceInPaise, recipientBalanceInPaise] = await Promise.all([
+                redisService.getBalance(senderId),
+                redisService.getBalance(recipientId)
+            ])
+
             let transactionStatus: TransactionStatus = 'FAILURE';
 
             if (senderBalanceInPaise >= amountInPaise) {
