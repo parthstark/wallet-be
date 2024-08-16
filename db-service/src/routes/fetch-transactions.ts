@@ -17,9 +17,12 @@ router.post('/fetch-transactions', async (req, res) => {
             }
         })
 
+        const creditTransactions = result?.creditTransactions.filter(tx => tx.amountInPaise > 0)
+        const debitTransactions = result?.debitTransactions.filter(tx => tx.amountInPaise < 0)
+
         const allTransactions = [
-            ...(result?.creditTransactions || []),
-            ...(result?.debitTransactions || []),
+            ...(creditTransactions || []),
+            ...(debitTransactions || []),
         ];
 
         return res.json({ transactions: allTransactions });
