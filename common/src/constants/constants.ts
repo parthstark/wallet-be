@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+export const REDIS_URL = process.env.REDIS_URL!
+
 export const TRANSACTION_PRE_PROCESSOR_QUEUE = "TRANSACTION_PRE_PROCESSOR_QUEUE"
 export const TRANSACTION_PRE_DB_WRITER_QUEUE = "TRANSACTION_PRE_DB_WRITER_QUEUE"
 export const SIGNUP_USER_QUEUE = "SIGNUP_USER_QUEUE"

@@ -1,4 +1,4 @@
-import { TRANSACTION_PRE_PROCESSOR_QUEUE, TRANSACTION_PRE_DB_WRITER_QUEUE, SIGNUP_USER_QUEUE } from '../constants/constants'
+import { TRANSACTION_PRE_PROCESSOR_QUEUE, TRANSACTION_PRE_DB_WRITER_QUEUE, SIGNUP_USER_QUEUE, REDIS_URL } from '../constants/constants'
 import { createClient, RedisClientType } from 'redis';
 import { TransactionRequest } from '../types/transaction';
 import {
@@ -18,9 +18,9 @@ class RedisService {
     private redisPubSubClient: RedisClientType;
 
     private constructor() {
-        this.redisStoreClient = createClient();
-        this.redisQueueClient = createClient();
-        this.redisPubSubClient = createClient();
+        this.redisStoreClient = createClient({ url: REDIS_URL });
+        this.redisQueueClient = createClient({ url: REDIS_URL });
+        this.redisPubSubClient = createClient({ url: REDIS_URL });
 
         this.redisStoreClient.on('error', (err) => {
             console.error('redis error:', err);

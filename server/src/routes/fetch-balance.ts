@@ -23,7 +23,7 @@ router.post('/fetch-balance', authMiddleware, async (req, res) => {
 });
 
 const fetchUserBalance = async (userId: string): Promise<any> => {
-    const response = await axios.post('http://localhost:3002/api/v1/fetch-balance', {
+    const response = await axios.post('http://db-service:3002/api/v1/fetch-balance', {
         userId
     });
     return response.data.balance;

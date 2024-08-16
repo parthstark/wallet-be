@@ -16,7 +16,7 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
 };
 
 const authorizeUser = async (req: Request): Promise<any> => {
-    const response = await axios.post('http://localhost:3001/api/v1/authorize', {}, {
+    const response = await axios.post('http://auth-service:3001/api/v1/authorize', {}, {
         headers: {
             Authorization: req.headers.authorization
         }

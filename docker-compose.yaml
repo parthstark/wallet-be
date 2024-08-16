@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    volumes:
+      - redisdata:/data
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  
+  server:
+    build:
+      context: .
+      dockerfile: server/dockerfile
+    container_name: server
+    environment:
+      REDIS_URL: redis://redis:6379
+      LOAD_CASH_PASSWORD: 12345
+    depends_on:
+      - redis
+    working_dir: /usr/src/app
+    command: npm start
+    ports:
+      - "3000:3000"
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/dockerfile
+    container_name: auth-service
+    environment:
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET_KEY: 12345
+    depends_on:
+      - redis
+    working_dir: /usr/src/app
+    command: npm start
+
+  db-service:
+    build:
+      context: .
+      dockerfile: db-service/dockerfile
+    container_name: db-service
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://postgres:mysecretpassword@postgres:5432/postgres
+    depends_on:
+      - redis
+      - postgres
+    working_dir: /usr/src/app
+    command: npm start
+
+  tx-processor:
+    build:
+      context: .
+      dockerfile: tx-processor/dockerfile
+    container_name: tx-processor
+    environment:
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - redis
+    working_dir: /usr/src/app
+    command: npm start
+
+volumes:
+  pgdata:
+  redisdata:
