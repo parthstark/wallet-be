@@ -17,6 +17,12 @@ router.post('/send-money', authMiddleware, async (req, res) => {
         })
     }
 
+    if (recipientId == userId) {
+        return res.status(400).json({
+            message: "recipient and sender can't be same"
+        })
+    }
+
     const transactionId = uuidv4()
     const transactionRequest: TransactionRequest = {
         transactionId,
