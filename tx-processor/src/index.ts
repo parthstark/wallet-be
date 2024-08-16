@@ -11,6 +11,7 @@ async function processTransaction() {
             if (!transactionId) {
                 continue
             }
+            const doesRecipientIdExists = await redisService.existsInBalanceStore(recipientId)
 
             const [senderBalanceInPaise, recipientBalanceInPaise] = await Promise.all([
                 redisService.getBalance(senderId),
@@ -20,7 +21,7 @@ async function processTransaction() {
             let transactionStatus: TransactionStatus | undefined
             let timestamp: number | undefined
 
-            if (senderBalanceInPaise >= amountInPaise) {
+            if (doesRecipientIdExists && senderBalanceInPaise >= amountInPaise) {
                 const newSenderBalanceInPaise = senderBalanceInPaise - amountInPaise;
                 const newRecipientBalanceInPaise = recipientBalanceInPaise + amountInPaise;
                 timestamp = new Date().getTime()

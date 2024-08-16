@@ -9,7 +9,7 @@ import {
     signupUserResponse,
     getUserHashedPasswordRequest,
     ExecutedTransaction
-} from 'types/redis-service';
+} from '../types/redis-service';
 
 class RedisService {
     private static instance: RedisService;
@@ -106,13 +106,20 @@ class RedisService {
     public async getBalance(userId: string): Promise<number> {
         const accountIdKey = `balance:${userId}`;
         const accountIdBalanceString = await this.redisStoreClient.get(accountIdKey);
-        const accountIdBalanceInPaise = parseInt(accountIdBalanceString || '0', 10);
+
+        const accountIdBalanceInPaise = parseInt(accountIdBalanceString ?? '0', 10);
         return accountIdBalanceInPaise
     }
 
     public async setBalance({ userId, balanceInPaise }: setBalanceRequest): Promise<void> {
         const accountIdKey = `balance:${userId}`;
         await this.redisStoreClient.set(accountIdKey, balanceInPaise);
+    }
+
+    public async existsInBalanceStore(userId: string): Promise<boolean> {
+        const accountIdKey = `balance:${userId}`;
+        const exists = await this.redisStoreClient.exists(accountIdKey)
+        return exists === 1
     }
 
     public async signupUser({ username, hashedPassword }: userRequest): Promise<signupUserResponse> {
@@ -122,6 +129,7 @@ class RedisService {
         }
 
         await this.redisStoreClient.set(`user:${username}`, hashedPassword);
+        await this.redisStoreClient.set(`balance:${username}`, 0);
         return { alreadyExists: false }
     }
 

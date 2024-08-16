@@ -26,7 +26,7 @@ const fetchUserTransactions = async (userId: string): Promise<any> => {
     const response = await axios.post('http://localhost:3002/api/v1/fetch-transactions', {
         userId
     });
-    return response.data.balance;
+    return response.data.transactions;
 };
 
 export default router;
