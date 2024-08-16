@@ -132,6 +132,16 @@ class RedisService {
     public async pushSignupUserQueue(user: userRequest): Promise<void> {
         await this.redisQueueClient.rPush(SIGNUP_USER_QUEUE, JSON.stringify(user));
     }
+
+    public async popSignupUserQueue(): Promise<userRequest> {
+        const { element } = await this.redisQueueClient.blPop(SIGNUP_USER_QUEUE, 0) ?? {};
+        if (!element) {
+            return emptyUserRequest
+        }
+
+        const userRequest: userRequest = JSON.parse(element);
+        return userRequest
+    }
 }
 
 const emptyTransaction: TransactionRequest = {
@@ -149,6 +159,11 @@ const emptyExecutedTransaction: ExecutedTransaction = {
     newSenderBalanceInPaise: 0,
     newRecipientBalanceInPaise: 0,
     timestamp: 0
+}
+
+const emptyUserRequest: userRequest = {
+    username: '',
+    hashedPassword: ''
 }
 
 export default RedisService;
