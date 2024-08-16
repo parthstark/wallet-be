@@ -4,14 +4,14 @@ import authMiddleware from 'middlewares/authMiddleware';
 
 const router = Router();
 
-router.post('/fetch-balance', authMiddleware, async (req, res) => {
+router.post('/fetch-transactions', authMiddleware, async (req, res) => {
     const { userId } = req.body
 
     try {
-        const balance = await fetchUserBalance(userId);
+        const transactions = await fetchUserTransactions(userId);
         return res.json({
             userId,
-            balance
+            transactions
         });
     } catch (error) {
         if (isAxiosError(error) && error.response) {
@@ -22,8 +22,8 @@ router.post('/fetch-balance', authMiddleware, async (req, res) => {
     }
 });
 
-const fetchUserBalance = async (userId: string): Promise<any> => {
-    const response = await axios.post('http://localhost:3002/api/v1/fetch-balance', {
+const fetchUserTransactions = async (userId: string): Promise<any> => {
+    const response = await axios.post('http://localhost:3002/api/v1/fetch-transactions', {
         userId
     });
     return response.data.balance;
