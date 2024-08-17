@@ -11,7 +11,7 @@ services:
     image: postgres:latest
     container_name: postgres
     environment:
-      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
   
@@ -21,8 +21,8 @@ services:
       dockerfile: server/dockerfile
     container_name: server
     environment:
-      REDIS_URL: redis://redis:6379
-      LOAD_CASH_PASSWORD: 12345
+      REDIS_URL: ${REDIS_URL}
+      LOAD_CASH_PASSWORD: ${LOAD_CASH_PASSWORD}
     depends_on:
       - redis
     working_dir: /usr/src/app
@@ -36,8 +36,8 @@ services:
       dockerfile: auth-service/dockerfile
     container_name: auth-service
     environment:
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET_KEY: 12345
+      REDIS_URL: ${REDIS_URL}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     depends_on:
       - redis
     working_dir: /usr/src/app
@@ -49,8 +49,8 @@ services:
       dockerfile: db-service/dockerfile
     container_name: db-service
     environment:
-      REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgresql://postgres:mysecretpassword@postgres:5432/postgres
+      REDIS_URL: ${REDIS_URL}
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       - redis
       - postgres
@@ -63,7 +63,7 @@ services:
       dockerfile: tx-processor/dockerfile
     container_name: tx-processor
     environment:
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: ${REDIS_URL}
     depends_on:
       - redis
     working_dir: /usr/src/app
