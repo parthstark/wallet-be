@@ -4,6 +4,7 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 COPY server/package.json /usr/src/app
+RUN mkdir /usr/src/common
 COPY common/package.json /usr/src/common
 
 # Install dependencies
@@ -13,7 +14,7 @@ RUN npm install
 COPY server/ /usr/src/app
 
 # Copy the common directory from the context
-COPY common /usr/src/common
+COPY common/ /usr/src/common
 
 # Command to run your app
 CMD ["npm", "start"]
