@@ -3,18 +3,20 @@ FROM node:20-alpine
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-COPY auth-service/package.json /usr/src/app
-RUN mkdir /usr/src/common
-COPY common/package.json /usr/src/common
+# Copy the package.json of auth-service
+COPY auth-service/package.json ./
+
+# Create the directory for common and copy the package.json
+RUN mkdir -p /usr/src/common
+COPY common/package.json /usr/src/common/
 
 # Install dependencies
 RUN npm install
+RUN npm install --prefix /usr/src/common/
 
 # Copy the rest of the application code
-COPY auth-service/ /usr/src/app
-
-# Copy the common directory from the context
-COPY common/ /usr/src/common
+COPY auth-service/ ./
+COPY common/ /usr/src/common/
 
 # Command to run your app
 CMD ["npm", "start"]
