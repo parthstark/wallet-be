@@ -4,6 +4,7 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 COPY db-service/package.json /usr/src/app
+COPY common/package.json /usr/src/common
 
 # Install dependencies
 RUN npm install
