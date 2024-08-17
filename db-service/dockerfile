@@ -12,7 +12,7 @@ RUN npm install
 COPY db-service/ /usr/src/app
 
 # Copy the common directory from the context
-COPY ../common /usr/src/common
+COPY common /usr/src/common
 
 # Generate prisma clients
 RUN npx prisma generate

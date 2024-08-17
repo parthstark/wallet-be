@@ -12,7 +12,7 @@ RUN npm install
 COPY tx-processor/ /usr/src/app
 
 # Copy the common directory from the context
-COPY ../common /usr/src/common
+COPY common /usr/src/common
 
 # Command to run your app
 CMD ["npm", "start"]
